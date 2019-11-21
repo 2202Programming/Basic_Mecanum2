@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
+import edu.wpi.first.wpilibj.drive.MecanumDrive;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -39,7 +40,9 @@ public class Robot extends TimedRobot {
 
   XboxController m_xbox = new XboxController(0);
 
-  RobotDrive m_robotDrive = new RobotDrive(m_frontMotorR, m_backMotorR, m_frontMotorL, m_backMotorL);
+  // RobotDrive m_robotDrive = new RobotDrive(m_frontMotorR, m_backMotorR, m_frontMotorL, m_backMotorL);
+  MecanumDrive m_mechanumDrive = new MecanumDrive(m_frontMotorR, m_backMotorR, m_frontMotorL, m_backMotorL);
+  
 
   /**
    * This function is run when the robot is first started up and should be
@@ -103,7 +106,8 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
-    m_robotDrive.mecanumDrive_Cartesian(m_xbox.getX(Hand.kLeft), m_xbox.getY(Hand.kLeft), m_xbox.getX(Hand.kRight), m_xbox.getY(Hand.kRight));
+    //m_robotDrive.mecanumDrive_Cartesian(m_xbox.getX(Hand.kLeft), m_xbox.getY(Hand.kLeft), m_xbox.getX(Hand.kRight), m_xbox.getY(Hand.kRight));
+    m_mechanumDrive.driveCartesian(m_xbox.getX(Hand.kLeft), m_xbox.getY(Hand.kLeft), m_xbox.getX(Hand.kRight));
   }
 
   /**
