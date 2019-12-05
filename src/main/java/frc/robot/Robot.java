@@ -40,10 +40,33 @@ public class Robot extends TimedRobot {
 
   XboxController m_xbox = new XboxController(0);
 
+  public static LIDAR_Subsystem m_lidar = new LIDAR_Subsystem();
+
   // RobotDrive m_robotDrive = new RobotDrive(m_frontMotorR, m_backMotorR, m_frontMotorL, m_backMotorL);
   MecanumDrive m_mechanumDrive = new MecanumDrive(m_frontMotorR, m_backMotorR, m_frontMotorL, m_backMotorL);
   
+  public static int b = 0; 
+  
+  
+  //distance between two lidar
+ //public static final double LIDAR_DIST = 57.15;
+  /*
+  public double P = 1;
+  public double I = 0.01;
+  public double Error = 0.0;
+  public double desiredAngle = 0.0;
+  public double integral = 0.0;
+  */
+  public double powerRight;
+  public double powerLeft;
+  public double straightPower;
+  public double turningPowerRight;
+  public double turningPowerLeft;
 
+
+  public static PID pid_distance = new PID(150);
+  public static PID pid_angle = new PID(0);
+  
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
@@ -107,7 +130,52 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     //m_robotDrive.mecanumDrive_Cartesian(m_xbox.getX(Hand.kLeft), m_xbox.getY(Hand.kLeft), m_xbox.getX(Hand.kRight), m_xbox.getY(Hand.kRight));
-    m_mechanumDrive.driveCartesian(m_xbox.getX(Hand.kLeft), m_xbox.getY(Hand.kLeft), m_xbox.getX(Hand.kRight));
+    m_mechanumDrive.driveCartesian(m_xbox.getX(Hand.kRight), ((m_xbox.getX(Hand.kLeft)/3)*-1), ((m_xbox.getY(Hand.kLeft)/3)*-1));
+
+    if(b == 0){
+    double angle = m_lidar.findAngle();
+    SmartDashboard.putNumber("Angle", angle);
+   // pid_angle.rightMotor(angle);
+    // pid_angle.leftMotor(angle);
+   // double distance = m_lidar.getDistance();
+    double power = pid_angle.getMotor(angle);
+      if(power > 0){
+        power = Math.abs(power);
+        turningPowerRight = power;
+        turningPowerLeft = 0;
+      }
+      else{
+        power = Math.abs(power);
+        turningPowerLeft = power;
+        turningPowerRight = 0;
+      }
+    }
+    if(b == 10){
+      double distance = m_lidar.getDistance();
+      SmartDashboard.putNumber("distance", distance);
+
+      double power = pid_distance.getMotor(distance);
+
+      straightPower = Math.abs(power);
+    }
+
+    powerRight = straightPower + turningPowerRight;
+    powerLeft = straightPower + turningPowerLeft;
+
+
+    SmartDashboard.putNumber("powerRight", powerRight);
+    SmartDashboard.putNumber("powerLeft", powerLeft);
+    SmartDashboard.putNumber("straightPower", straightPower);
+
+    SmartDashboard.putNumber("turningPowerRight", turningPowerRight);
+    SmartDashboard.putNumber("turningPowerLeft", turningPowerLeft);
+
+
+    b++;
+
+    if(b == 20){
+      b = 0; 
+    }
   }
 
   /**
